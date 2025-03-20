@@ -168,7 +168,7 @@ def getExpectedColocProbsFromSCs(sc_adata, sample, cell_types, sc_data_sampleCol
     return scCTpairsProbs
 #%%
 
-def get_pairCatDFdir(niches, coloc_probs, coloc_clusts):
+#def get_pairCatDFdir(niches, coloc_probs, coloc_clusts):
     
     """Get dataframe of cell pair to niche pair correspondence
 
@@ -186,18 +186,47 @@ def get_pairCatDFdir(niches, coloc_probs, coloc_clusts):
     pairCatDFdir : pd.DataFrame
         dataframe of cell pairs and corresponding niche pairs
     """
+#    pairsDir=[]
+#    for ct in coloc_probs.columns[range(len(coloc_probs.columns)-1)]:
+#        for ct2 in coloc_probs.columns[range(len(coloc_probs.columns)-1)]:
+#            pairsDir.append(ct+'->'+ct2)
+#    pairCatDFdir=pd.DataFrame(pairsDir, columns=['cell_pairs'])
+    
+#    pairCatDFdir['niche_pairs']=''
+#    for clust in np.sort(coloc_clusts.unique()):
+#        pairCatDFdir['niche_pairs'][[cellCatContained(pair=p, cellCat=coloc_clusts.index[coloc_clusts==clust]) for p in pairCatDFdir.cell_pairs]]=clust+'->'+clust
+
+#    for comb in list(itertools.permutations(list(niches.keys()), 2)):
+#        pairCatDFdir['niche_pairs'][[(p.split('->')[0] in niches[comb[0]]) & (p.split('->')[1] in niches[comb[1]]) for p in pairCatDFdir.cell_pairs]]=comb[0]+'->'+comb[1]
+
+#    return pairCatDFdir
+    
+def get_pairCatDFdir(niches_df):
+    
+    """Get dataframe of cell pair to niche pair correspondence
+
+    Parameters
+    ----------
+    niches_df : pd.Dataframe
+        Dataframe of cells, corresponding niche and corresponding niche color
+
+    Returns
+    -------
+    pairCatDFdir : pd.DataFrame
+        dataframe of cell pairs and corresponding niche pairs
+    """
     pairsDir=[]
-    for ct in coloc_probs.columns[range(len(coloc_probs.columns)-1)]:
-        for ct2 in coloc_probs.columns[range(len(coloc_probs.columns)-1)]:
+    for ct in niches_df.cell[range(len(niches_df.cell)-1)]:
+        for ct2 in niches_df.cell[range(len(niches_df.cell)-1)]:
             pairsDir.append(ct+'->'+ct2)
     pairCatDFdir=pd.DataFrame(pairsDir, columns=['cell_pairs'])
     
     pairCatDFdir['niche_pairs']=''
-    for clust in np.sort(coloc_clusts.unique()):
-        pairCatDFdir['niche_pairs'][[cellCatContained(pair=p, cellCat=coloc_clusts.index[coloc_clusts==clust]) for p in pairCatDFdir.cell_pairs]]=clust+'->'+clust
+    for clust in np.sort(niches_df.niche.unique()):
+        pairCatDFdir['niche_pairs'][[cellCatContained(pair=p, cellCat=niches_df.cell[niches_df.niche==clust]) for p in pairCatDFdir.cell_pairs]]=clust+'->'+clust
 
-    for comb in list(itertools.permutations(list(niches.keys()), 2)):
-        pairCatDFdir['niche_pairs'][[(p.split('->')[0] in niches[comb[0]]) & (p.split('->')[1] in niches[comb[1]]) for p in pairCatDFdir.cell_pairs]]=comb[0]+'->'+comb[1]
+    for comb in list(itertools.permutations(list(niches_df.niche.unique().sort_values()), 2)):
+        pairCatDFdir['niche_pairs'][[(p.split('->')[0] in niches_df.cell[niches_df.niche==comb[0]]) & (p.split('->')[1] in niches_df.cell[niches_df.niche==comb[1]]) for p in pairCatDFdir.cell_pairs]]=comb[0]+'->'+comb[1]
 
     return pairCatDFdir
 #%%
